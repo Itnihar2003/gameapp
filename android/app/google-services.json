@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "287277989522",
+    "project_id": "sports-989c3",
+    "storage_bucket": "sports-989c3.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:287277989522:android:38e68cffacf864d6b1304b",
+        "android_client_info": {
+          "package_name": "com.example.coachui"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "287277989522-snoeqahqi8qeuehifp8gao3e9e7f44p9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.coachui",
+            "certificate_hash": "8027cab29df7763d5310591bb3eb1ea3518bce65"
+          }
+        },
+        {
+          "client_id": "287277989522-i8c437r6voimb1g294ftaigbm3pp9000.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDKQ4zXW-EP_CWGCLJXt9KoVZFGv_915hE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "287277989522-i8c437r6voimb1g294ftaigbm3pp9000.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
