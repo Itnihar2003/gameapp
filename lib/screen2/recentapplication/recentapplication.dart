@@ -94,4 +94,3 @@ class _RecentApplicationPageState extends State<RecentApplicationPage> {
     );
   }
 }
-

@@ -17,6 +17,13 @@ class RecentApplicationEdit1 extends StatelessWidget {
       'email': 'triston.bode@example.com',
       'phone': '(444) 342-763',
       'status': 'ENQUIRY',
+    },{
+      'name': 'Avish Yadav',
+      'batch': 'U-23',
+      'date': 'Apr 12, 2020',
+      'email': 'triston.bode@example.com',
+      'phone': '(444) 342-763',
+      'status': 'ENQUIRY',
     },
   ];
 

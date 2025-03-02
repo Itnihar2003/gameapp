@@ -10,7 +10,7 @@ class UserService {
     String? birthDate,
   }) async {
     const String url =
-        'https://1823-2409-40e2-17-14f9-147c-562-de01-b02c.ngrok-free.app/api/users/updateUser'; // Replace with your endpoint URL
+        'http://wswogwcs08gcw4c840s8wwsw.152.70.67.68.sslip.io/api/users/updateUser'; // Replace with your endpoint URL
 
     Map<String, String> headers = {"Content-Type": "application/json"};
 

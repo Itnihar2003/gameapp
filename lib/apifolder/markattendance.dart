@@ -3,7 +3,7 @@ import 'dart:convert';
 
 class AttendanceService {
   static const String _baseUrl =
-      'https://1823-2409-40e2-17-14f9-147c-562-de01-b02c.ngrok-free.app/api/users';
+      'http://wswogwcs08gcw4c840s8wwsw.152.70.67.68.sslip.io/api/users';
 
   // Function to mark attendance
   static Future<Map<String, dynamic>?> markAttendance(

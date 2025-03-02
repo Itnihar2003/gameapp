@@ -1,7 +1,11 @@
-
-
+import 'package:coachui/screen2/createbatchpage/BatchesPage.dart';
+import 'package:coachui/screen2/dashboardpages/dashboard.dart';
+// import 'package:coachui/screen2/dashboardpages/dashboard.dart';
+import 'package:coachui/screen2/detailedfeehistorypages/batch_list_page.dart';
+import 'package:coachui/screen2/recentapplication/recentapplication.dart';
 import 'package:coachui/screens/activityinsightspages/previous.dart';
-import 'package:coachui/screens/homepage/dashboard.dart';
+
+
 import 'package:coachui/screens/paymentpages/paymenthistory.dart';
 import 'package:coachui/screens/profile/profile.dart';
 import 'package:coachui/screens/selectionpages/batchselection.dart';
@@ -31,7 +35,9 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       home: OnboardingPage(),
+      
       debugShowCheckedModeBanner: false,
     );
   }
 }
+

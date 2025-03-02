@@ -12,27 +12,44 @@ class SortByContainer extends StatefulWidget {
 class _SortByContainerState extends State<SortByContainer> {
   int? _selectedButtonIndex;
   String? _selectedBatch;
-
+  int? _selecteddayIndex;
+  String? datename;
   void _showFilterOptions(BuildContext context) {
     showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setModalState) {
-            double buttonWidth = (MediaQuery.of(context).size.width - 0) / 3.5; // Subtracting padding and margin
+            double buttonWidth = (MediaQuery.of(context).size.width - 0) /
+                3.5; // Subtracting padding and margin
 
             // List of button labels
-            List<String> buttonLabels = ['U-14', 'U-16', 'U-19', 'U-23', 'Senior', 'Summercamp', 'Women'];
+            List<String> buttonLabels = [
+              'U-14',
+              'U-16',
+              'U-19',
+              'U-23',
+              'Senior',
+              'Summercamp',
+              'Women'
+            ];
+            List<String> date = [
+              'Today',
+              'yesterday',
+              'yesterday',
+            ];
 
             return Container(
-              height: MediaQuery.of(context).size.height * 0.45, // 45% of the screen height
-              width: MediaQuery.of(context).size.width, // Full width of the screen
+              height: MediaQuery.of(context).size.height *
+                  0.75, // 45% of the screen height
+              width:
+                  MediaQuery.of(context).size.width, // Full width of the screen
               padding: EdgeInsets.all(16.0),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(20.0),
-                  topRight: Radius.circular(20.0),
+                  topLeft: Radius.circular(40.0),
+                  topRight: Radius.circular(40.0),
                 ),
               ),
               child: Column(
@@ -72,7 +89,7 @@ class _SortByContainerState extends State<SortByContainer> {
                             });
                           },
                           style: ElevatedButton.styleFrom(
-                             backgroundColor: _selectedButtonIndex == index
+                            backgroundColor: _selectedButtonIndex == index
                                 ? Colors.purple
                                 : Colors.white,
                             foregroundColor: _selectedButtonIndex == index
@@ -80,13 +97,62 @@ class _SortByContainerState extends State<SortByContainer> {
                                 : Colors.black,
                             side: BorderSide(color: Colors.grey),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8.0), // Less border radius for more rectangular shape
+                              borderRadius: BorderRadius.circular(
+                                  20.0), // Less border radius for more rectangular shape
                             ),
                           ),
                           child: Text(
                             buttonLabels[index],
                             style: TextStyle(
                               color: _selectedButtonIndex == index
+                                  ? Colors.white
+                                  : Colors.black,
+                            ),
+                          ),
+                        ),
+                      );
+                    }),
+                  ),
+                  SizedBox(height: 20.0),
+                  Text(
+                    'Date',
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 16.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Wrap(
+                    spacing: 8.0,
+                    runSpacing: 8.0,
+                    children: List.generate(date.length, (index) {
+                      return Container(
+                        width: buttonWidth,
+                        height: 40, // Fixed height for rectangular shape
+                        child: ElevatedButton(
+                          onPressed: () {
+                            setModalState(() {
+                              _selecteddayIndex = index;
+                              datename = date[index];
+                            });
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: _selecteddayIndex == index
+                                ? Colors.purple
+                                : Colors.white,
+                            foregroundColor: _selecteddayIndex == index
+                                ? Colors.white
+                                : Colors.black,
+                            side: BorderSide(color: Colors.grey),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(
+                                  20.0), // Less border radius for more rectangular shape
+                            ),
+                          ),
+                          child: Text(
+                            date[index],
+                            style: TextStyle(
+                              color: _selecteddayIndex == index
                                   ? Colors.white
                                   : Colors.black,
                             ),
@@ -104,11 +170,13 @@ class _SortByContainerState extends State<SortByContainer> {
                           setModalState(() {
                             _selectedButtonIndex = null;
                             _selectedBatch = null;
+                            _selecteddayIndex = null;
+                            datename = null;
                           });
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.white,
-                         foregroundColor: Colors.purple,
+                          foregroundColor: Colors.purple,
                           side: BorderSide(color: Colors.purple),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8.0),
@@ -118,11 +186,13 @@ class _SortByContainerState extends State<SortByContainer> {
                       ),
                       ElevatedButton(
                         onPressed: () {
-                          widget.onBatchSelected(_selectedBatch); // Pass selected batch to parent
+                          widget.onBatchSelected(
+                              _selectedBatch); // Pass selected batch to parent
                           Navigator.pop(context); // Close the bottom sheet
                         },
                         style: ElevatedButton.styleFrom(
-                          foregroundColor: Colors.white, backgroundColor: Colors.purple,
+                          foregroundColor: Colors.white,
+                          backgroundColor: Colors.purple,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8.0),
                           ),

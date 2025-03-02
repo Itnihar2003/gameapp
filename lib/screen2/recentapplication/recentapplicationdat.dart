@@ -240,7 +240,11 @@ class _RecentApplicationDataState extends State<RecentApplicationData> {
             ),
             SizedBox(height: 20),
             // Approve Button
-            SizedBox(
+         
+          ],
+        ),
+      ),
+      bottomNavigationBar:SizedBox(
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: isApproved
@@ -252,10 +256,10 @@ class _RecentApplicationDataState extends State<RecentApplicationData> {
                         });
                       },
                 style: ElevatedButton.styleFrom(
-                  padding: EdgeInsets.symmetric(vertical: 14),
+                  padding: EdgeInsets.symmetric(vertical: 14,horizontal: 10),
                   backgroundColor: isApproved ? Colors.grey : Colors.blue,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(20),
                   ),
                 ),
                 child: Text(
@@ -268,15 +272,12 @@ class _RecentApplicationDataState extends State<RecentApplicationData> {
                 ),
               ),
             ),
-          ],
-        ),
-      ),
     );
   }
 
   Widget _buildInfoRow(String title, String value) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      padding: const EdgeInsets.symmetric(vertical: 16.0),
       child: Row(
         children: [
           Text(

@@ -1,25 +1,24 @@
-import 'package:coachui/screen2/dashboardpages/dashboard.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:coachui/features/bottomnavigationbar/bottomnavigation.dart';
+import 'package:coachui/features/bottomnavigationbar/bottomnavigationbar2.dart';
 import 'package:coachui/screens/onboardingpages/authpages/registerpage/registerpage1.dart';
-import 'package:pinput/pinput.dart';
+import 'package:coachui/apifolder/getuser.dart'; // Import your UserService
 
 class OTPPage extends StatefulWidget {
   final bool fromSignIn;
   final String phoneNumber;
   final String verificationId;
 
-  OTPPage(
-      {Key? key,
-      required this.fromSignIn,
-      required this.phoneNumber,
-      required this.verificationId})
-      : super(key: key);
+  OTPPage({
+    Key? key,
+    required this.fromSignIn,
+    required this.phoneNumber,
+    required this.verificationId,
+  }) : super(key: key);
 
   @override
   State<OTPPage> createState() => _OTPPageState();
@@ -27,22 +26,36 @@ class OTPPage extends StatefulWidget {
 
 class _OTPPageState extends State<OTPPage> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-
   final TextEditingController _otpController = TextEditingController();
-  var code = "";
-  signin() async {
-    PhoneAuthCredential credential = PhoneAuthProvider.credential(
-        verificationId: widget.verificationId, smsCode: code);
+
+  Future<void> _createUserInBackend(String firebaseUid, String mobileNumber) async {
+    const String url = 'http://wswogwcs08gcw4c840s8wwsw.152.70.67.68.sslip.io/api/users/createUser';
+    Map<String, String> headers = {"Content-Type": "application/json"};
+
+    Map<String, dynamic> body = {
+      "firebaseUid": firebaseUid,
+      "mobileNumber": mobileNumber,
+    };
+
     try {
-      await FirebaseAuth.instance
-          .signInWithCredential(credential)
-          .then((value) {
-        Get.offAll(DashboardScreen());
-      });
-    } on FirebaseAuthException catch (e) {
-      Get.snackbar("Error found", e.code);
-    }catch(e){
-Get.snackbar("Error found", e.toString());
+      final response = await http.post(
+        Uri.parse(url),
+        headers: headers,
+        body: json.encode(body),
+      );
+
+      if (response.statusCode == 201) {
+        print('User created successfully in backend');
+      } else if (response.statusCode == 400 && json.decode(response.body)['error'] == 'User already exists') {
+        print('User already exists in backend');
+      } else {
+        throw Exception('Failed to create user: ${response.statusCode} - ${response.body}');
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Backend error: ${e.toString()}')),
+      );
+      rethrow; // Rethrow to handle navigation failure
     }
   }
 
@@ -73,99 +86,75 @@ Get.snackbar("Error found", e.toString());
               ),
               const SizedBox(height: 20),
               Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 40),
-                  child:
-                  //  Pinput(
-                  //   length: 6,
-                  //   onChanged: (value) {
-                  //     setState(() {
-                  //       code = value;
-                  //     });
-                  //   },
-                  // )
+                padding: const EdgeInsets.symmetric(horizontal: 40),
+                child: PinCodeTextField(
+                  appContext: context,
+                  length: 6,
+                  controller: _otpController,
+                  onChanged: (value) {},
+                  onCompleted: (value) async {
+                    try {
+                      PhoneAuthCredential credential = PhoneAuthProvider.credential(
+                        verificationId: widget.verificationId,
+                        smsCode: value,
+                      );
 
-                  PinCodeTextField(
-                    appContext: context,
-                    length: 6,
-                    controller: _otpController,
-                    onChanged: (value) {},
-                    onCompleted: (value) async {
-                      bool otpVerified = false;
+                      UserCredential userCredential = await _auth.signInWithCredential(credential);
+                      User? user = userCredential.user;
 
-                      try {
-                        PhoneAuthCredential credential =
-                            PhoneAuthProvider.credential(
-                          verificationId: widget.verificationId,
-                          smsCode: value,
-                        );
-                        UserCredential userCredential =
-                            await _auth.signInWithCredential(credential);
-                        String firebaseUid = userCredential.user!.uid;
-
-                        otpVerified = true;
+                      if (user != null) {
+                        // Call backend API to create/sync user
+                        await _createUserInBackend(user.uid, user.phoneNumber ?? widget.phoneNumber);
 
                         if (widget.fromSignIn) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Sign in successful')),
-                          );
-
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(builder: (context) => Navigation()),
-                          );
-                        } else {
-                          print("api fetch");
-                          final response = await _createUserInBackend(
-                              firebaseUid, widget.phoneNumber);
-
-                          if (response.statusCode == 201) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                  content: Text('User created successfully')),
-                            );
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => RegistrationPage()),
-                            );
-                          } else {
-                            String errorMessage = 'Failed to create user';
-                            if (response.body.isNotEmpty) {
-                              var responseData = json.decode(response.body);
-                              if (responseData.containsKey('error')) {
-                                errorMessage = responseData['error'];
-                              }
+                          // Sign-in flow: Check role and navigate
+                          final userData = await UserService.getUser(user.uid);
+                          if (userData != null && userData.containsKey('role')) {
+                            String role = userData['role'];
+                            if (role == 'Player') {
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(builder: (context) => Navigation()),
+                              );
+                            } else if (role == 'Coach') {
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(builder: (context) => Navigation2()),
+                              );
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('Unknown role: $role')),
+                              );
                             }
+                          } else {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text(errorMessage)),
+                              const SnackBar(content: Text('Failed to fetch user data or role not set')),
                             );
                           }
+                        } else {
+                          // Sign-up flow: Navigate to RegistrationPage
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(builder: (context) => RegistrationPage()),
+                          );
                         }
-                      } catch (e) {
+                      } else {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                              content: Text('Invalid OTP. Please try again.')),
+                          const SnackBar(content: Text('Authentication failed')),
                         );
-                      } finally {
-                        // Call Hello World endpoint regardless of OTP verification status
-                        await _callHelloWorldEndpoint(context, otpVerified);
                       }
-                    },
-                    // pinTheme: PinTheme(
-                    //   shape: PinCodeFieldShape.box,
-                    //   borderRadius: BorderRadius.circular(10),
-                    //   fieldHeight: 35,
-                    //   fieldWidth: 35,
-                    //   inactiveFillColor: Colors.grey[200],
-                    //   activeFillColor: Colors.white,
-                    //   selectedFillColor: Colors.white,
-                    // ),
-                    textStyle: const TextStyle(fontSize: 24),
-                    keyboardType: TextInputType.number,
-                    enablePinAutofill: true,
-                    autoFocus: true,
-                  ),
-                  ),
+                    } catch (e) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Error: ${e.toString()}')),
+                      );
+                    }
+                  },
+                  textStyle: const TextStyle(fontSize: 24),
+                  keyboardType: TextInputType.number,
+                  enablePinAutofill: true,
+                  autoFocus: true,
+                ),
+              ),
               const SizedBox(height: 20),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 52.0),
@@ -190,63 +179,13 @@ Get.snackbar("Error found", e.toString());
                 ),
               ),
               ElevatedButton(
-                  onPressed: () {}, child: Text("verify and proceed"))
+                onPressed: () {}, // Optionally implement manual verification
+                child: const Text("Verify and Proceed"),
+              ),
             ],
           ),
         ),
       ),
     );
-  }
-
-  Future<http.Response> _createUserInBackend(
-      String firebaseUid, String mobileNumber) async {
-    const String url =
-        'https://b9f0-2401-4900-1c84-f1e7-c46d-d9f1-b93e-96f5.ngrok-free.app/api/users/createUser';
-    Map<String, String> headers = {"Content-Type": "application/json"};
-
-    Map<String, dynamic> body = {
-      "firebaseUid": firebaseUid,
-      "name": "Default Name", // Update with actual name input if available
-      "mobileNumber": mobileNumber,
-      "gender": "Unknown" // Update with actual gender if available
-    };
-
-    final response = await http.post(
-      Uri.parse(url),
-      headers: headers,
-      body: json.encode(body),
-    );
-
-    return response;
-  }
-
-  Future<void> _callHelloWorldEndpoint(
-      BuildContext context, bool otpVerified) async {
-    const String helloUrl =
-        'https://3079-2401-4900-1c85-85af-a4d1-735d-89b5-345d.ngrok-free.app/api/users/hello';
-
-    try {
-      final response = await http.get(Uri.parse(helloUrl));
-
-      if (response.statusCode == 200) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text(
-                  'Hello World request successful: OTP Verified - $otpVerified')),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text(
-                  'Failed to call Hello World endpoint: OTP Verified - $otpVerified')),
-        );
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text(
-                'Error calling Hello World endpoint: OTP Verified - $otpVerified')),
-      );
-    }
   }
 }

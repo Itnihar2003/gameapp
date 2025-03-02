@@ -3,7 +3,7 @@ import 'dart:convert';
 
 class UserService {
   static const String baseUrl =
-      'https://1823-2409-40e2-17-14f9-147c-562-de01-b02c.ngrok-free.app/api/users';
+      'http://wswogwcs08gcw4c840s8wwsw.152.70.67.68.sslip.io/api/users';
 
   // Method to get user by Firebase UID
   static Future<Map<String, dynamic>?> getUser(String firebaseUid) async {
@@ -31,7 +31,7 @@ class UserService {
     required String description, // Description of the batch
   }) async {
     const String url =
-        'https://1823-2409-40e2-17-14f9-147c-562-de01-b02c.ngrok-free.app/api/users/createBatch'; // Replace with your actual URL
+        'http://wswogwcs08gcw4c840s8wwsw.152.70.67.68.sslip.io/api/users/createBatch'; // Replace with your actual URL
 
     // Creating the body for the POST request
     Map<String, dynamic> body = {

@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:coachui/features/calenderhorizontal/calenderhori.dart';
+import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:coachui/apifolder/getuser.dart'; // Import the service to get user data
 import 'package:coachui/apifolder/markattendance.dart'; // Import the service to mark attendance
 import 'package:coachui/screens/notify/notification.dart';
+
 class DashboardScreen extends StatefulWidget {
   @override
   _DashboardScreenState createState() => _DashboardScreenState();
@@ -56,8 +58,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
       User? firebaseUser = FirebaseAuth.instance.currentUser;
       if (firebaseUser != null) {
         // You can use real-time location here
-        double latitude = 21.4974; // Example latitude (use geolocator for real values)
-        double longitude = 83.9040; // Example longitude (use geolocator for real values)
+        double latitude =
+            21.4974; // Example latitude (use geolocator for real values)
+        double longitude =
+            83.9040; // Example longitude (use geolocator for real values)
 
         // Mark attendance using the attendance service
         final response = await AttendanceService.markAttendance(
@@ -79,7 +83,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
     } catch (e) {
       print('Error marking attendance: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('An error occurred while marking attendance')),
+        const SnackBar(
+            content: Text('An error occurred while marking attendance')),
       );
     }
   }
@@ -110,12 +115,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   // Notification icon using Image.asset
                   GestureDetector(
                     onTap: () {
-                       Navigator.push(
-                       context,
-                       MaterialPageRoute(
-                       builder: (context) => NotificationScreen(), // Replace with your NotificationPage
-                       ),
-                    );
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              NotificationScreen(), // Replace with your NotificationPage
+                        ),
+                      );
                     },
                     child: Image.asset(
                       'assets/u4.png',
@@ -240,8 +246,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       backgroundColor: Colors.transparent,
                       padding: EdgeInsets.symmetric(vertical: 16.0),
                       shape: RoundedRectangleBorder(
-                        borderRadius:
-                            BorderRadius.circular(30.0),
+                        borderRadius: BorderRadius.circular(30.0),
                       ),
                       elevation: 0,
                     ),
@@ -256,6 +261,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                 ),
               ),
+            
               SizedBox(height: 16),
               Text(
                 'Summary',
@@ -348,8 +354,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       children: [
                         Text(
                           label,
-                          style:
-                              TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                              fontSize: 14, fontWeight: FontWeight.bold),
                         ),
                         Text(
                           subLabel,
